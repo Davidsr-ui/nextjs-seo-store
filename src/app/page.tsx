@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { getProducts } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 
@@ -18,23 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-}
-
 export default async function Home() {
-  const res = await fetch("https://fakestoreapi.com/products", {
-    next: { revalidate: 3600 },
-  });
-  if (!res.ok) {
-    throw new Error(`No se pudo cargar el catálogo: ${res.status}`);
-  }
-  const products: Product[] = await res.json();
+  const products = await getProducts();
 
   return (
     <div className="mx-auto max-w-7xl px-5 pt-8 sm:px-8 sm:pt-12">

@@ -1,20 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-  rating?: {
-    rate: number;
-    count: number;
-  };
-}
+import { getProductById } from "@/lib/products";
 
 export async function generateMetadata({
   params,
@@ -22,12 +9,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
-  if (res.status === 404) notFound();
-  if (!res.ok) {
-    throw new Error(`No se pudo cargar el producto ${id}: ${res.status}`);
-  }
-  const product: Product = await res.json();
+  const product = await getProductById(id);
 
   return {
     title: product.title,
@@ -47,13 +29,7 @@ export default async function ProductoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  if (!/^\d+$/.test(id)) notFound();
-  const res = await fetch(`https://fakestoreapi.com/products/${id}`);
-  if (res.status === 404) notFound();
-  if (!res.ok) {
-    throw new Error(`No se pudo cargar el producto ${id}: ${res.status}`);
-  }
-  const product: Product = await res.json();
+  const product = await getProductById(id);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
